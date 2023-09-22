@@ -1,3 +1,0 @@
-# The-Last-Gatekeeper
-
-readme
