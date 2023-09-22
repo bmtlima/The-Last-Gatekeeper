@@ -1,65 +1,3 @@
-/*
-OneLoneCoder.com - Code-It-Yourself! Asteroids at the command prompt (quick and simple c++)
-"This one just kept growing..." - @Javidx9
-
-License
-~~~~~~~
-One Lone Coder Console Game Engine  Copyright (C) 2018  Javidx9
-This program comes with ABSOLUTELY NO WARRANTY.
-This is free software, and you are welcome to redistribute it
-under certain conditions; See license for details.
-Original works located at:
-https://www.github.com/onelonecoder
-https://www.onelonecoder.com
-https://www.youtube.com/javidx9
-GNU GPLv3
-https://github.com/OneLoneCoder/videos/blob/master/LICENSE
-
-From Javidx9 :)
-~~~~~~~~~~~~~~~
-Hello! Ultimately I don't care what you use this for. It's intended to be
-educational, and perhaps to the oddly minded - a little bit of fun.
-Please hack this, change it and use it in any way you see fit. You acknowledge
-that I am not responsible for anything bad that happens as a result of
-your actions. However this code is protected by GNU GPLv3, see the license in the
-github repo. This means you must attribute me if you use it. You can view this
-license here: https://github.com/OneLoneCoder/videos/blob/master/LICENSE
-Cheers!
-
-Background
-~~~~~~~~~~
-I needed a quick video to keep up with my upload schedule, and thought "oh asteroids
-must be simple", and indeed it was, but it was a bit rubbish, and didn't really
-offer anything educational, until I made the decision to ditch sprites and use
-vector models like the original game. This made the game considerably more sophisticated,
-has opened up new possibilities for the game engine, and just goes to show, jus 'cos
-it's old, doesn't mean it's irrelevant.
-
-I ended up with a demonstration of physics, wireframe graphics, 2D matrix transformations,
-toroidal space mapping and vector manipulation.
-
-Controls
-~~~~~~~~
-Left and Right arrow keys steer the ship. Up arrow is thrust. There is no reverse thrust.
-Space bar fires bullets. Get the highest score by surviving waves of asteroids.
-
-Author
-~~~~~~
-Twitter: @javidx9
-Blog: www.onelonecoder.com
-YouTube: www.youtube.com/javidx9
-
-Video:
-~~~~~~
-https://youtu.be/QgDR8LrRZhk
-
-Last Updated: 30/08/2017
-*/
-
-
-/* Addition Joseph21 - 20220715
- *   - removed "using namespace std" and added explicit scope resolution operator where needed
- */
 
 #include <iostream>
 #include <string>
@@ -417,7 +355,7 @@ protected:
 
 int main()
 {
-	// Use olcConsoleGameEngine derived app
+	// Use olcPixelGameEngine derived app
 	OneLoneCoder_Asteroids game;
 	if (game.Construct(320, 200, 4, 4))
 		game.Start();
