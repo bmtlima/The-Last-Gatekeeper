@@ -2,43 +2,21 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+//#include <gtest/gtest.h>
  //using namespace std;
 
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
+#include "Header.h"
 
-class OneLoneCoder_Asteroids : public olc::PixelGameEngine
+
+OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 {
-public:
-	OneLoneCoder_Asteroids()
-	{
-		sAppName = "Asteroids";
-	}
+	sAppName = "Asteroids";
+}
 
-private:
-	struct sSpaceObject
-	{
-		int nSize;
-		float x;
-		float y;
-		float dx;
-		float dy;
-		float angle;
-	};
-
-	std::vector<sSpaceObject> vecAsteroids;
-	std::vector<sSpaceObject> vecBullets;
-	sSpaceObject player;
-	sSpaceObject enemy;
-	bool bDead = false;
-	int nScore = 0;
-
-	std::vector<std::pair<float, float>> vecModelShip;
-	std::vector<std::pair<float, float>> vecModelAsteroid;
-
-protected:
 	// Override from Game Engine
-	virtual bool OnUserCreate()
+	bool OneLoneCoder_Asteroids::OnUserCreate()
 	{
 		vecModelShip =
 		{
@@ -62,7 +40,7 @@ protected:
 		return true;
 	}
 
-	void ResetGame()
+	void OneLoneCoder_Asteroids::ResetGame()
 	{
 		// Initialize Player Position
 		player.x = ScreenWidth() / 2.0f;
@@ -91,7 +69,7 @@ protected:
 	}
 
 	// Implements "wrap around" for various in-game sytems
-	void WrapCoordinates(float ix, float iy, float& ox, float& oy)
+	void OneLoneCoder_Asteroids::WrapCoordinates(float ix, float iy, float& ox, float& oy)
 	{
 		ox = ix;
 		oy = iy;
@@ -102,21 +80,21 @@ protected:
 	}
 
 	// Overriden to handle toroidal drawing routines
-	virtual bool Draw(int x, int y, olc::Pixel col = olc::WHITE)
+	bool OneLoneCoder_Asteroids::Draw(int x, int y, olc::Pixel col)
 	{
 		float fx, fy;
 		WrapCoordinates(x, y, fx, fy);
-		olc::PixelGameEngine::Draw(fx, fy, col);
-		return true;
+		return olc::PixelGameEngine::Draw(fx, fy, col);
 	}
 
-	bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y)
+	// Checking if point is inside circle
+	bool OneLoneCoder_Asteroids::IsPointInsideCircle(float cx, float cy, float radius, float x, float y)
 	{
-		return (x - cx) * (x - cx) + (y - cy) * (y - cy) < radius*radius;
+		return (x - cx) * (x - cx) + (y - cy) * (y - cy) < radius * radius;
 	}
 
 	// Called by olcConsoleGameEngine
-	virtual bool OnUserUpdate(float fElapsedTime)
+	bool OneLoneCoder_Asteroids::OnUserUpdate(float fElapsedTime)
 	{
 		if (bDead)
 			ResetGame();
@@ -255,7 +233,7 @@ protected:
 			Draw(b.x, b.y);
 
 		// Draw Ship
-		DrawWireFrameModel(vecModelShip, player.x, player.y, player.angle);
+		DrawWireFrameModel(vecModelShip, player.x, player.y, player.angle, 1.0f);
 
 		// Draw Enemy
 		DrawWireFrameModel(vecModelShip, enemy.x, enemy.y, enemy.angle + 1.5708f, 1.0f, olc::RED); // Draw enemy in red for distinction
@@ -311,7 +289,7 @@ protected:
 		return true;
 	}
 
-	void DrawWireFrameModel(const std::vector<std::pair<float, float>>& vecModelCoordinates, float x, float y, float r = 0.0f, float s = 1.0f, olc::Pixel col = olc::WHITE)
+	void OneLoneCoder_Asteroids::DrawWireFrameModel(const std::vector<std::pair<float, float>>& vecModelCoordinates, float x, float y, float r, float s, olc::Pixel col)
 	{
 		// pair.first = x coordinate
 		// pair.second = y coordinate
@@ -350,7 +328,7 @@ protected:
 				vecTransformedCoordinates[j % verts].first, vecTransformedCoordinates[j % verts].second, col);
 		}
 	}
-};
+
 
 
 int main()
