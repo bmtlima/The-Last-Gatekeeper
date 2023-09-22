@@ -296,7 +296,7 @@ protected:
 		float nDiffY = player.y - enemy.y;
 		enemy.angle = atan2f(nDiffY, nDiffX);
 
-		const float enemySpeed = 20.0f; // Define a suitable speed for the enemy
+		const float enemySpeed = 20.0f; // Enemy's speed
 		enemy.dx = enemySpeed * cosf(enemy.angle);
 		enemy.dy = enemySpeed * sinf(enemy.angle);
 
