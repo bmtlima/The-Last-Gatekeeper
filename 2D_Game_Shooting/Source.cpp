@@ -35,16 +35,6 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 				noise * cosf(((float)i / (float)verts) * 6.28318f)));
 		}
 
-		for (int i = 0; i < 360; i += 15) // 15-degree separation between lines
-		{
-			for (int j = -90; j <= 90; j += 10) // Latitude points for each line
-			{
-				float x = 50 * cosf(i * 3.14159f / 180.0f);
-				float y = 50 * sinf(i * 3.14159f / 180.0f) * cosf(j * 3.14159f / 180.0f);
-				vecEarthModel.push_back({ x, y });
-			}
-		}
-
 		ResetGame();
 
 		return true;
@@ -145,6 +135,26 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 		// Update and draw asteroids
 		for (auto& a : vecAsteroids)
 		{
+
+			// Calculate direction towards the center of the screen
+			float dirX = (ScreenWidth() * 0.5f - a.x);
+			float dirY = (ScreenHeight() * 0.5f - a.y);
+			float magnitude = sqrt(dirX * dirX + dirY * dirY);
+
+			// Normalize the direction
+			if (magnitude != 0)
+			{
+				dirX /= magnitude;
+				dirY /= magnitude;
+			}
+
+			// Speed of asteroid
+			float speed = 5.0f; // Adjust this as needed
+
+			// Update asteroid's velocity based on direction
+			a.dx = dirX * speed;
+			a.dy = dirY * speed;
+
 			// VELOCITY changes POSITION (with respect to time)
 			a.x += a.dx * fElapsedTime;
 			a.y += a.dy * fElapsedTime;
@@ -260,10 +270,10 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 			float dist = sqrt(dx * dx + dy * dy);
 			float distSquared = dist * dist + 1.0f;  // Adding 1 to avoid division by zero
 
-			if (dist < a.nSize * 20) // Gravity only has an effect within 10 times the asteroid's size
+			if (dist < a.nSize * 15) // Gravity only has an effect within 10 times the asteroid's size
 			{
 				// Calculate gravitational force (simplified)
-				float gravityForce = (a.nSize / distSquared) * 1000.0f;  // We multiply by 50 just as a scaling factor to make the force noticeable
+				float gravityForce = (a.nSize / distSquared) * 300.0f;  // We multiply by 50 just as a scaling factor to make the force noticeable
 
 				// Calculate acceleration components
 				float ax = gravityForce * (dx / dist);
@@ -297,50 +307,25 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 		//	bDead = true;
 
 		// Draw Earth as a circle
-		FillCircle(ScreenWidth() / 2, ScreenHeight() / 2, 50, olc::BLUE);
+		FillCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS, olc::BLUE);
 
 		// Draw countries based on current rotation
-		for (const auto& country : mapCountries) {
-			float x, y;
-			if (LongitudeToX(country.second.first, country.second.second, fRotation, x, y)) {
-				olc::Pixel color = countryColors[country.first];
-
-				// If there are more than 2 vertices, we can form triangles
-				if (countryShapes[country.first].size() > 2) {
-					for (size_t i = 0; i < countryShapes[country.first].size() - 2; i++) {
-						float x0, y0, x1, y1, x2, y2;
-
-						// Fetch the vertices for a triangle
-						bool bV0 = LongitudeToX(country.second.first + countryShapes[country.first][0].first * fCountryScale,
-							country.second.second + countryShapes[country.first][0].second * fCountryScale,
-							fRotation, x0, y0);
-
-						bool bV1 = LongitudeToX(country.second.first + countryShapes[country.first][i + 1].first * fCountryScale,
-							country.second.second + countryShapes[country.first][i + 1].second * fCountryScale,
-							fRotation, x1, y1);
-
-						bool bV2 = LongitudeToX(country.second.first + countryShapes[country.first][i + 2].first * fCountryScale,
-							country.second.second + countryShapes[country.first][i + 2].second * fCountryScale,
-							fRotation, x2, y2);
-
-						if (bV0 && bV1 && bV2 &&
-							IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, 50, x0, y0) &&
-							IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, 50, x1, y1) &&
-							IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, 50, x2, y2)) {
-
-							// Fill the country with a triangle
-							FillTriangle(x0, y0, x1, y1, x2, y2, color);
-						}
-					}
-				}
-			}
-		}
+		DrawRotatingEarth(fRotation);
 
 		// Keep fRotation between 0 and 2*PI
 		fRotation += fSpeed;
 		if (fRotation > 2.0f * 3.14159f)
 			fRotation -= 2.0f * 3.14159f;
 
+		// Player dies if any asteroid gets too close to earth
+
+		for (auto& a : vecAsteroids)
+		{
+				// Check distance from asteroid to center of screen
+				float distToCenter = sqrt((a.x - ScreenWidth() / 2.0f) * (a.x - ScreenWidth() / 2.0f) + (a.y - ScreenHeight() / 2.0f) * (a.y - ScreenHeight() / 2.0f));
+			if (distToCenter < EARTH_RADIUS + a.nSize)
+				bDead = true;
+		}
 
 		return true;
 	}
@@ -384,15 +369,6 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 			DrawLine(vecTransformedCoordinates[i].first, vecTransformedCoordinates[i].second,
 				vecTransformedCoordinates[j].first, vecTransformedCoordinates[j].second, col);
 		}
-
-		/* WASN'T WORKING PROPERLY
-		for (int i = 0; i < verts + 1; i++)
-		{
-			int j = (i + 1);
-			DrawLine(vecTransformedCoordinates[i % verts].first, vecTransformedCoordinates[i % verts].second,
-				vecTransformedCoordinates[j % verts].first, vecTransformedCoordinates[j % verts].second, col);
-		}
-		*/ 
 		
 	}
 

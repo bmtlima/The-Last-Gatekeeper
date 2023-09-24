@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cmath>
+#include <map>
+#include <vector>
 #include "olcPixelGameEngine.h"
 
 class OneLoneCoder_Asteroids : public olc::PixelGameEngine
@@ -40,6 +43,7 @@ private:
     sSpaceObject enemy;
     bool bDead = false;
     int nScore = 0;
+    int nLevel = 1;
 
     std::vector<std::pair<float, float>> vecModelShip;
     std::vector<std::pair<float, float>> vecModelAsteroid;
@@ -48,7 +52,14 @@ private:
 
     float fRotation = 0.0f;   // Rotation angle in radians
     float fSpeed = 0.005f;     // Rotation speed in radians per frame
-    float fCountryScale = 5.0f;  // Scale up countries by a factor of 2
+    float fCountryScale = 2.5f;  // Scale up countries by a factor of 2
+
+    const float PI = 3.14159f;
+    const float EARTH_RADIUS = 30.0f;
+    const float ATMOSPHERE = 4.0f; // Thickness of Earth's atmosphere for shading
+
+    using Point = std::pair<float, float>;
+    using Country = std::map<std::string, std::vector<Point>>;
 
     // A few example countries/landmarks and their longitudinal and latitudinal positions in degrees
     std::map<std::string, std::pair<float, float>> mapCountries = {
@@ -75,40 +86,87 @@ private:
     };
 
     std::map<std::string, olc::Pixel> countryColors = {
-    {"US", olc::RED},
+    {"US", olc::GREEN},
     {"Brazil", olc::GREEN},
-    {"UK", olc::CYAN},
-    {"India", olc::YELLOW},
-    {"Japan", olc::MAGENTA},
-    {"Australia", olc::RED},
-    {"Russia", olc::BLUE},
-    {"South Africa", olc::WHITE},
-    {"Antarctica", olc::GREY},
-    {"Arctic", olc::GREY}
+    {"UK", olc::GREEN},
+    {"India", olc::GREEN},
+    {"Japan", olc::GREEN},
+    {"Australia", olc::GREEN},
+    {"Russia", olc::GREEN},
+    {"South Africa", olc::GREEN},
+    {"Antarctica", olc::GREEN},
+    {"Arctic", olc::GREEN}
     };
 
-    bool LongitudeToX(float longitude, float latitude, float rotation, float& outX, float& outY)
-    {
-        float radianLongitude = longitude * 3.14159f / 180.0f + rotation;
-        float radianLatitude = latitude * 3.14159f / 180.0f;
+    float DegreeToRadian(float degree) {
+        return degree * PI / 180.0f;
+    }
 
-        // Handle wrap around
-        while (radianLongitude < -3.14159f)
-            radianLongitude += 2.0f * 3.14159f;
-        while (radianLongitude > 3.14159f)
-            radianLongitude -= 2.0f * 3.14159f;
+    bool LongitudeToX(float longitude, float latitude, float rotation, float& outX, float& outY) {
+        float radianLongitude = DegreeToRadian(longitude) + rotation;
 
-        outX = 50.0f * cosf(radianLongitude) + ScreenWidth() / 2;
+        // Handle wrap-around.
+        while (radianLongitude < -PI)
+            radianLongitude += 2.0f * PI;
+        while (radianLongitude > PI)
+            radianLongitude -= 2.0f * PI;
+
+        outX = EARTH_RADIUS * cosf(radianLongitude) + ScreenWidth() / 2;
         outY = LatitudeToY(latitude);
 
-        // If the country is on the visible side of the Earth
-        return cosf(radianLongitude + 3.14159f / 2) > 0;
+        return cosf(radianLongitude + PI / 2) > 0;
     }
 
     // Convert latitude to y-position with respect to the screen height
     float LatitudeToY(float latitude) {
-        float yRange = ScreenHeight() / 4; // max range in y-direction based on latitude
+        float yRange = ScreenHeight() / 4;
         return ScreenHeight() / 2 - yRange * (latitude / 90.0f);
+    }
+
+    std::pair<float, float> MidPoint(float x1, float y1, float x2, float y2) {
+        return { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f };
+    }
+
+    void DrawRotatingEarth(float rotation) {
+        // Draw Earth with smooth shading to represent the atmosphere
+        for (int y = 0; y < ScreenHeight(); y++) {
+            for (int x = 0; x < ScreenWidth(); x++) {
+                float distance = sqrt((x - ScreenWidth() / 2) * (x - ScreenWidth() / 2) + (y - ScreenHeight() / 2) * (y - ScreenHeight() / 2));
+                if (distance < EARTH_RADIUS + ATMOSPHERE && distance > EARTH_RADIUS - ATMOSPHERE) {
+                    float alpha = 1.0f - abs(distance - EARTH_RADIUS) / ATMOSPHERE;
+                    Draw(x, y, olc::Pixel(135, 206, 235, alpha * 255)); // SkyBlue color
+                }
+                else if (distance <= EARTH_RADIUS) {
+                    Draw(x, y, olc::BLUE);
+                }
+            }
+        }
+
+        for (const auto& country : mapCountries) {
+            float x, y;
+            if (LongitudeToX(country.second.first, country.second.second, rotation, x, y)) {
+                olc::Pixel color = countryColors[country.first];
+
+                if (countryShapes[country.first].size() > 2) {
+                    for (size_t i = 0; i < countryShapes[country.first].size() - 2; i++) {
+                        float x0, y0, x1, y1, x2, y2;
+                        bool bV0 = LongitudeToX(country.second.first + countryShapes[country.first][0].first * fCountryScale,
+                            country.second.second + countryShapes[country.first][0].second * fCountryScale, rotation, x0, y0);
+                        bool bV1 = LongitudeToX(country.second.first + countryShapes[country.first][i + 1].first * fCountryScale,
+                            country.second.second + countryShapes[country.first][i + 1].second * fCountryScale, rotation, x1, y1);
+                        bool bV2 = LongitudeToX(country.second.first + countryShapes[country.first][i + 2].first * fCountryScale,
+                            country.second.second + countryShapes[country.first][i + 2].second * fCountryScale, rotation, x2, y2);
+
+                        if (bV0 && bV1 && bV2 &&
+                            IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x0, y0) &&
+                            IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x1, y1) &&
+                            IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x2, y2)) {
+                            FillTriangle(x0, y0, x1, y1, x2, y2, color);
+                        }
+                    }
+                }
+            }
+        }
     }
 };
 
