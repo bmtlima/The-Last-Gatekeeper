@@ -29,6 +29,15 @@ public:
 
     void DrawWireFrameModel(const std::vector<std::pair<float, float>>& vecModelCoordinates, float x, float y, float r = 0.0f, float s = 1.0f, olc::Pixel col = olc::WHITE);
 
+    float DegreeToRadian(float degree);
+
+    float LatitudeToY(float latitude);
+
+    bool LongitudeToX(float longitude, float latitude, float rotation, float& outX, float& outY);
+
+    void DrawRotatingEarth(float rotation);
+
+    float GetPI() const { return PI; }
 
 private:
     struct sSpaceObject
@@ -37,10 +46,26 @@ private:
         float x, y, dx, dy, angle;
     };
 
+    struct sAsteroidDebris
+    {
+        float x, y;   // Position
+        float dx, dy; // Velocity
+        float angle;  // Rotation
+        olc::Pixel color; // Color with alpha for fading effect
+    };
+
+    struct sStar {
+        float x, y;       // Position of star
+        olc::Pixel color; // Color of star 
+    };
+
+    std::vector<sStar> vecStars;
+    std::vector<sAsteroidDebris> vecAsteroidDebris;
+
     std::vector<sSpaceObject> vecAsteroids;
     std::vector<sSpaceObject> vecBullets;
     sSpaceObject player;
-    sSpaceObject enemy;
+    //sSpaceObject enemy;
     bool bDead = false;
     int nScore = 0;
     int nLevel = 1;
@@ -52,7 +77,7 @@ private:
 
     float fRotation = 0.0f;   // Rotation angle in radians
     float fSpeed = 0.005f;     // Rotation speed in radians per frame
-    float fCountryScale = 2.5f;  // Scale up countries by a factor of 2
+    float fCountryScale = 4.0f;  // Scale up countries by a factor of 2
 
     const float PI = 3.14159f;
     const float EARTH_RADIUS = 30.0f;
@@ -82,7 +107,6 @@ private:
     {"Australia", {{-2, -1}, {2, -1}, {1, 2}, {-1, 2}}},
     {"Russia", {{-4, 3}, {4, 3}, {3, -3}, {-3, -3}}},
     {"South Africa", {{-2, 1}, {2, 1}, {0, -2}}},
-    
     };
 
     std::map<std::string, olc::Pixel> countryColors = {
@@ -94,80 +118,9 @@ private:
     {"Australia", olc::GREEN},
     {"Russia", olc::GREEN},
     {"South Africa", olc::GREEN},
-    {"Antarctica", olc::GREEN},
-    {"Arctic", olc::GREEN}
     };
 
-    float DegreeToRadian(float degree) {
-        return degree * PI / 180.0f;
-    }
-
-    bool LongitudeToX(float longitude, float latitude, float rotation, float& outX, float& outY) {
-        float radianLongitude = DegreeToRadian(longitude) + rotation;
-
-        // Handle wrap-around.
-        while (radianLongitude < -PI)
-            radianLongitude += 2.0f * PI;
-        while (radianLongitude > PI)
-            radianLongitude -= 2.0f * PI;
-
-        outX = EARTH_RADIUS * cosf(radianLongitude) + ScreenWidth() / 2;
-        outY = LatitudeToY(latitude);
-
-        return cosf(radianLongitude + PI / 2) > 0;
-    }
-
-    // Convert latitude to y-position with respect to the screen height
-    float LatitudeToY(float latitude) {
-        float yRange = ScreenHeight() / 4;
-        return ScreenHeight() / 2 - yRange * (latitude / 90.0f);
-    }
-
-    std::pair<float, float> MidPoint(float x1, float y1, float x2, float y2) {
-        return { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f };
-    }
-
-    void DrawRotatingEarth(float rotation) {
-        // Draw Earth with smooth shading to represent the atmosphere
-        for (int y = 0; y < ScreenHeight(); y++) {
-            for (int x = 0; x < ScreenWidth(); x++) {
-                float distance = sqrt((x - ScreenWidth() / 2) * (x - ScreenWidth() / 2) + (y - ScreenHeight() / 2) * (y - ScreenHeight() / 2));
-                if (distance < EARTH_RADIUS + ATMOSPHERE && distance > EARTH_RADIUS - ATMOSPHERE) {
-                    float alpha = 1.0f - abs(distance - EARTH_RADIUS) / ATMOSPHERE;
-                    Draw(x, y, olc::Pixel(135, 206, 235, alpha * 255)); // SkyBlue color
-                }
-                else if (distance <= EARTH_RADIUS) {
-                    Draw(x, y, olc::BLUE);
-                }
-            }
-        }
-
-        for (const auto& country : mapCountries) {
-            float x, y;
-            if (LongitudeToX(country.second.first, country.second.second, rotation, x, y)) {
-                olc::Pixel color = countryColors[country.first];
-
-                if (countryShapes[country.first].size() > 2) {
-                    for (size_t i = 0; i < countryShapes[country.first].size() - 2; i++) {
-                        float x0, y0, x1, y1, x2, y2;
-                        bool bV0 = LongitudeToX(country.second.first + countryShapes[country.first][0].first * fCountryScale,
-                            country.second.second + countryShapes[country.first][0].second * fCountryScale, rotation, x0, y0);
-                        bool bV1 = LongitudeToX(country.second.first + countryShapes[country.first][i + 1].first * fCountryScale,
-                            country.second.second + countryShapes[country.first][i + 1].second * fCountryScale, rotation, x1, y1);
-                        bool bV2 = LongitudeToX(country.second.first + countryShapes[country.first][i + 2].first * fCountryScale,
-                            country.second.second + countryShapes[country.first][i + 2].second * fCountryScale, rotation, x2, y2);
-
-                        if (bV0 && bV1 && bV2 &&
-                            IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x0, y0) &&
-                            IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x1, y1) &&
-                            IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x2, y2)) {
-                            FillTriangle(x0, y0, x1, y1, x2, y2, color);
-                        }
-                    }
-                }
-            }
-        }
-    }
+ 
 };
 
 #endif

@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
- //using namespace std;
 
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
@@ -19,20 +18,29 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 	{
 		vecModelShip =
 		{
-			{ 0.0f, -5.0f},
-			{-2.5f, +2.5f},
-			{+2.5f, +2.5f}
-		}; // Isoceles Triangle
+			{ 0.0f, -7.0f },
+			{ -3.0f, +4.0f },
+			{ 0.0f, +2.5f },
+			{ +3.0f, +4.0f }
+		};
 
-		// Create a "jagged" circle for the asteroid. It's important it remains
-		// mostly circular, as we do a simple collision check against a perfect
-		// circle.
-		int verts = 20;
+		// Creating a "jagged" circle for the asteroid. 
+		int verts = 30;
 		for (int i = 0; i < verts; i++)
 		{
 			float noise = (float)rand() / (float)RAND_MAX * 0.4f + 0.8f;
 			vecModelAsteroid.push_back(std::make_pair(noise * sinf(((float)i / (float)verts) * 6.28318f),
 				noise * cosf(((float)i / (float)verts) * 6.28318f)));
+		}
+
+		int nStars = 100; // Number of stars in background
+		for (int i = 0; i < nStars; i++) {
+			sStar star;
+			star.x = (float)(rand() % ScreenWidth());
+			star.y = (float)(rand() % ScreenHeight());
+			float brightness = (rand() % 255) * 0.8f + 0.2f * 255; // This makes sure the star is not too dim
+			star.color = olc::Pixel(brightness, brightness, brightness);
+			vecStars.push_back(star);
 		}
 
 		ResetGame();
@@ -42,26 +50,36 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 
 	void OneLoneCoder_Asteroids::ResetGame()
 	{
+		nLevel = 1;
+
 		// Initialize Player Position
 		player.x = ScreenWidth() / 2.0f;
-		player.y = ScreenHeight() / 2.0f;
+		player.y = ScreenHeight() * 3.0f / 4.0f;
 		player.dx = 0.0f;
 		player.dy = 0.0f;
 		player.angle = 0.0f;
-
-		// Initialize Enemy Position
-		enemy.x = ScreenWidth() / 3.0f;
-		enemy.y = ScreenHeight() / 3.0f;
-		enemy.dx = 0.0f;
-		enemy.dy = 0.0f;
-		enemy.angle = 0.0f;
 
 		vecBullets.clear();
 		vecAsteroids.clear();
 
 		// Put in two asteroids
-		vecAsteroids.push_back({ (int)16, 20.0f, 20.0f, 8.0f, -6.0f, 0.0f });
-		vecAsteroids.push_back({ (int)16, 100.0f, 20.0f, -5.0f, 3.0f, 0.0f });
+		vecAsteroids.push_back({ (int)16, ScreenWidth() - 20.0f, ScreenHeight() - 20.0f, 8.0f, -6.0f, 0.0f });
+		vecAsteroids.push_back({ (int)16, ScreenWidth() - 100.0f, ScreenHeight() - 20.0f, -5.0f, 3.0f, 0.0f });
+
+		if (nLevel > 1) {
+			for (int i = 0; i < nLevel + 1; i++) {
+				float ax, ay;
+				do {
+					ax = (float)(rand() % ScreenWidth());
+					ay = (float)(rand() % ScreenHeight());
+				} while (sqrt((player.x - ax) * (player.x - ax) + (player.y - ay) * (player.y - ay)) < 50); // Check distance from player
+
+				float adx = 2.0f * (((float)rand() / RAND_MAX) - 0.5f); // Random velocities 
+				float ady = 2.0f * (((float)rand() / RAND_MAX) - 0.5f);
+
+				vecAsteroids.push_back({ (int)16, ax, ay, adx, ady, 0.0f });
+			}
+		}
 
 		// Reset game
 		bDead = false;
@@ -102,21 +120,28 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 		// Clear Screen
 		FillRect(0, 0, ScreenWidth(), ScreenHeight(), olc::BLACK);
 
+		// Render Stars
+		for (const auto& star : vecStars) {
+			Draw((int)star.x, (int)star.y, star.color);
+		}
+
+		// Draw Earth as a circle
+		FillCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS, olc::BLUE);
+
 		// Steer Ship
 		if (GetKey(olc::Key::A).bHeld)
 			player.angle -= 5.0f * fElapsedTime;
 		if (GetKey(olc::Key::D).bHeld)
 			player.angle += 5.0f * fElapsedTime;
 
-		// Thrust? Apply ACCELERATION
+		// Acceleration
 		if (GetKey(olc::Key::W).bHeld)
 		{
-			// ACCELERATION changes VELOCITY (with respect to time)
 			player.dx += sin(player.angle) * 20.0f * fElapsedTime;
 			player.dy += -cos(player.angle) * 20.0f * fElapsedTime;
 		}
 
-		// VELOCITY changes POSITION (with respect to time)
+		// Velocity
 		player.x += player.dx * fElapsedTime;
 		player.y += player.dy * fElapsedTime;
 
@@ -149,22 +174,22 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 			}
 
 			// Speed of asteroid
-			float speed = 5.0f; // Adjust this as needed
+			float speed = 5.0f; 
 
 			// Update asteroid's velocity based on direction
 			a.dx = dirX * speed;
 			a.dy = dirY * speed;
 
-			// VELOCITY changes POSITION (with respect to time)
+			// Updating positions
 			a.x += a.dx * fElapsedTime;
 			a.y += a.dy * fElapsedTime;
-			a.angle += 0.5f * fElapsedTime; // Add swanky rotation :)
+			a.angle += 0.5f * fElapsedTime;
 
 			// Asteroid coordinates are kept in game space (toroidal mapping)
 			WrapCoordinates(a.x, a.y, a.x, a.y);
 
-			// Draw Asteroids
-			DrawWireFrameModel(vecModelAsteroid, a.x, a.y, a.angle, (float)a.nSize, olc::YELLOW);
+			// Drawing Asteroids
+			DrawWireFrameModel(vecModelAsteroid, a.x, a.y, a.angle, (float)a.nSize, olc::CYAN);
 		}
 
 		// Any new asteroids created after collision detection are stored
@@ -191,13 +216,26 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 					// so it is cleaned up by the removal algorithm.
 					b.x = -100;
 
+					for (int n = 0; n < 10; n++) // Generate 10 debris particles
+					{
+						vecAsteroidDebris.push_back({
+							a.x, a.y,
+							2.0f * (float(rand()) / float(RAND_MAX) - 0.5f),
+							2.0f * (float(rand()) / float(RAND_MAX) - 0.5f),
+							float(rand()) / float(RAND_MAX) * 2.0f * 3.14159f,
+							olc::Pixel(255, 255, 0, 255) // Yellow with full alpha
+							});
+					}
+
 					// Create child asteroids
 					if (a.nSize > 4)
 					{
 						float angle1 = ((float)rand() / (float)RAND_MAX) * 6.283185f;
 						float angle2 = ((float)rand() / (float)RAND_MAX) * 6.283185f;
-						newAsteroids.push_back({ (int)a.nSize >> 1 ,a.x, a.y, 10.0f * sinf(angle1), 10.0f * cosf(angle1), 0.0f });
-						newAsteroids.push_back({ (int)a.nSize >> 1 ,a.x, a.y, 10.0f * sinf(angle2), 10.0f * cosf(angle2), 0.0f });
+
+						float offsetDistance = a.nSize; // Set an offset distance based on the size of the asteroid
+						newAsteroids.push_back({ (int)a.nSize >> 1 ,a.x + offsetDistance * sinf(angle1), a.y + offsetDistance * cosf(angle1), 10.0f * sinf(angle1), 10.0f * cosf(angle1), 0.0f });
+						newAsteroids.push_back({ (int)a.nSize >> 1 ,a.x + offsetDistance * sinf(angle2), a.y + offsetDistance * cosf(angle2), 10.0f * sinf(angle2), 10.0f * cosf(angle2), 0.0f });
 					}
 
 					// Remove asteroid - Same approach as bullets
@@ -221,23 +259,45 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 				vecAsteroids.erase(i);
 		}
 
-		if (vecAsteroids.empty()) // If no asteroids, level complete! :) - you win MORE asteroids!
+		if (vecAsteroids.empty()) // If no asteroids, level complete. Generate more asteroids
 		{
 			// Level Clear
 			nScore += 1000; // Large score for level progression
 			vecAsteroids.clear();
 			vecBullets.clear();
+			nLevel++;
 
-			// Add two new asteroids, but in a place where the player is not, we'll simply
-			// add them 90 degrees left and right to the player, their coordinates will
-			// be wrapped by th enext asteroid update
-			vecAsteroids.push_back({ (int)16, 30.0f * sinf(player.angle - 3.14159f / 2.0f) + player.x,
-											  30.0f * cosf(player.angle - 3.14159f / 2.0f) + player.y,
-											  10.0f * sinf(player.angle), 10.0f * cosf(player.angle), 0.0f });
+			// Spawning asteroids near the borders
+			for (int i = 0; i < nLevel + 1; i++) {
+				float ax, ay;
 
-			vecAsteroids.push_back({ (int)16, 30.0f * sinf(player.angle + 3.14159f / 2.0f) + player.x,
-											  30.0f * cosf(player.angle + 3.14159f / 2.0f) + player.y,
-											  10.0f * sinf(-player.angle), 10.0f * cosf(-player.angle), 0.0f });
+				int borderChoice = rand() % 4; // Choose a border (0:Top, 1:Right, 2:Bottom, 3:Left)
+
+				switch (borderChoice) {
+				case 0: // Top
+					ax = (float)(rand() % ScreenWidth());
+					ay = 0.0f;
+					break;
+				case 1: // Right
+					ax = ScreenWidth() - 1.0f;
+					ay = (float)(rand() % ScreenHeight());
+					break;
+				case 2: // Bottom
+					ax = (float)(rand() % ScreenWidth());
+					ay = ScreenHeight() - 1.0f;
+					break;
+				case 3: // Left
+				default:
+					ax = 0.0f;
+					ay = (float)(rand() % ScreenHeight());
+					break;
+				}
+
+				float adx = 2.0f * (((float)rand() / RAND_MAX) - 0.5f); // Random velocities
+				float ady = 2.0f * (((float)rand() / RAND_MAX) - 0.5f);
+
+				vecAsteroids.push_back({ (int)16, ax, ay, adx, ady, 0.0f });
+			}
 		}
 
 		// Remove bullets that have gone off screen
@@ -250,16 +310,15 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 
 		// Draw Bullets
 		for (auto b : vecBullets)
-			Draw(b.x, b.y);
+			//Draw(b.x, b.y);
+			DrawLine(b.x, b.y, b.x + b.dx * 0.05, b.y + b.dy * 0.05, olc::RED);  // Change '0.1' to adjust the length of the bullet line.
 
 		// Draw Ship
-		DrawWireFrameModel(vecModelShip, player.x, player.y, player.angle, 1.0f);
+		DrawWireFrameModel(vecModelShip, player.x, player.y, player.angle, 1.0f);;
 
-		// Draw Enemy
-		DrawWireFrameModel(vecModelShip, enemy.x, enemy.y, enemy.angle + 1.5708f, 1.0f, olc::RED); // Draw enemy in red for distinction
-
-		// Draw Score
-		DrawString(2, 2, "SCORE: " + std::to_string(nScore));
+		// Rendering Score & Title
+		DrawString(ScreenWidth()/2 - 30, ScreenHeight() - 15, "SCORE: " + std::to_string(nScore));
+		DrawString(10, 10, "The Last Gatekeeper", olc::YELLOW, 2); // Displaying the title
 
 		// Gravity
 		for (auto& a : vecAsteroids)
@@ -288,26 +347,6 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 		player.x += player.dx * fElapsedTime;
 		player.y += player.dy * fElapsedTime;
 
-		// Enemy
-
-		float nDiffX = player.x - enemy.x;
-		float nDiffY = player.y - enemy.y;
-		enemy.angle = atan2f(nDiffY, nDiffX);
-
-		const float enemySpeed = 20.0f; // Enemy's speed
-		enemy.dx = enemySpeed * cosf(enemy.angle);
-		enemy.dy = enemySpeed * sinf(enemy.angle);
-
-		enemy.x += enemy.dx * fElapsedTime;
-		enemy.y += enemy.dy * fElapsedTime;
-
-		WrapCoordinates(enemy.x, enemy.y, enemy.x, enemy.y);
-
-		//if (IsPointInsideCircle(enemy.x, enemy.y, 5.0f, player.x, player.y))
-		//	bDead = true;
-
-		// Draw Earth as a circle
-		FillCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS, olc::BLUE);
 
 		// Draw countries based on current rotation
 		DrawRotatingEarth(fRotation);
@@ -326,6 +365,25 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 			if (distToCenter < EARTH_RADIUS + a.nSize)
 				bDead = true;
 		}
+
+		for (auto& d : vecAsteroidDebris)
+		{
+			d.x += d.dx * fElapsedTime;
+			d.y += d.dy * fElapsedTime;
+			d.angle += 2.0f * fElapsedTime; // Rotate the debris
+			d.color.a -= 30 * fElapsedTime; // Reduce alpha for fading effect
+
+			// Wrap coordinates to keep debris on screen
+			WrapCoordinates(d.x, d.y, d.x, d.y);
+
+			// Draw debris as tiny triangles
+			DrawWireFrameModel(vecModelShip, d.x, d.y, d.angle, 1.0f, d.color);
+		}
+
+		vecAsteroidDebris.erase(
+			remove_if(vecAsteroidDebris.begin(), vecAsteroidDebris.end(),
+				[&](sAsteroidDebris& d) { return d.color.a <= 0; }),
+			vecAsteroidDebris.end());
 
 		return true;
 	}
@@ -372,7 +430,74 @@ OneLoneCoder_Asteroids::OneLoneCoder_Asteroids()
 		
 	}
 
+// other functions
 
+	float OneLoneCoder_Asteroids::DegreeToRadian(float degree) {
+		return degree * 3.14159f / 180.0f;
+	}
+
+	// Convert latitude to y-position with respect to the screen height
+	float OneLoneCoder_Asteroids::LatitudeToY(float latitude) {
+		float yRange = ScreenHeight() / 4;
+		return ScreenHeight() / 2 - yRange * (latitude / 90.0f);
+	}
+
+	bool OneLoneCoder_Asteroids::LongitudeToX(float longitude, float latitude, float rotation, float& outX, float& outY) {
+		float radianLongitude = DegreeToRadian(longitude) + rotation;
+
+		// Handle wrap-around.
+		while (radianLongitude < -PI)
+			radianLongitude += 2.0f * PI;
+		while (radianLongitude > PI)
+			radianLongitude -= 2.0f * PI;
+
+		outX = EARTH_RADIUS * cosf(radianLongitude) + ScreenWidth() / 2;
+		outY = LatitudeToY(latitude);
+
+		return cosf(radianLongitude + PI / 2) > 0;
+	}
+
+	void OneLoneCoder_Asteroids::DrawRotatingEarth(float rotation) {
+		// Draw Earth with smooth shading to represent the atmosphere
+		for (int y = 0; y < ScreenHeight(); y++) {
+			for (int x = 0; x < ScreenWidth(); x++) {
+				float distance = sqrt((x - ScreenWidth() / 2) * (x - ScreenWidth() / 2) + (y - ScreenHeight() / 2) * (y - ScreenHeight() / 2));
+				if (distance < EARTH_RADIUS + ATMOSPHERE && distance > EARTH_RADIUS - ATMOSPHERE) {
+					float alpha = 1.0f - abs(distance - EARTH_RADIUS) / ATMOSPHERE;
+					Draw(x, y, olc::Pixel(135, 206, 235, alpha * 255)); // SkyBlue color
+				}
+				else if (distance <= EARTH_RADIUS) {
+					Draw(x, y, olc::BLUE);
+				}
+			}
+		}
+
+		for (const auto& country : mapCountries) {
+			float x, y;
+			if (LongitudeToX(country.second.first, country.second.second, rotation, x, y)) {
+				olc::Pixel color = countryColors[country.first];
+
+				if (countryShapes[country.first].size() > 2) {
+					for (size_t i = 0; i < countryShapes[country.first].size() - 2; i++) {
+						float x0, y0, x1, y1, x2, y2;
+						bool bV0 = LongitudeToX(country.second.first + countryShapes[country.first][0].first * fCountryScale,
+							country.second.second + countryShapes[country.first][0].second * fCountryScale, rotation, x0, y0);
+						bool bV1 = LongitudeToX(country.second.first + countryShapes[country.first][i + 1].first * fCountryScale,
+							country.second.second + countryShapes[country.first][i + 1].second * fCountryScale, rotation, x1, y1);
+						bool bV2 = LongitudeToX(country.second.first + countryShapes[country.first][i + 2].first * fCountryScale,
+							country.second.second + countryShapes[country.first][i + 2].second * fCountryScale, rotation, x2, y2);
+
+						if (bV0 && bV1 && bV2 &&
+							IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x0, y0) &&
+							IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x1, y1) &&
+							IsPointInsideCircle(ScreenWidth() / 2, ScreenHeight() / 2, EARTH_RADIUS - ATMOSPHERE, x2, y2)) {
+							FillTriangle(x0, y0, x1, y1, x2, y2, color);
+						}
+					}
+				}
+			}
+		}
+	}
 
 int main()
 {

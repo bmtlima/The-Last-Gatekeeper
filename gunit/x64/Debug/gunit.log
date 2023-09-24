@@ -1,2 +1,54 @@
 ﻿  test.cpp
-  gunit.vcxproj -> C:\Users\bruno\source\repos\2D_Game_Shooting\x64\Debug\gunit.exe
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,16): warning C4244: 'initializing': conversion from '_Ty' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+          and
+          [
+              _Ty1=float
+          ]
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Header.h(102,13): message : see reference to function template instantiation 'std::pair<float,float>::pair<int,int,0>(_Other1 &&,_Other2 &&) noexcept' being compiled
+          with
+          [
+              _Other1=int,
+              _Other2=int
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,54): warning C4244: 'initializing': conversion from '_Ty' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+          and
+          [
+              _Ty2=float
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,54): warning C4244: 'initializing': conversion from '_Ty' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+          and
+          [
+              _Ty2=float
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,16): warning C4244: 'initializing': conversion from '_Ty' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+          and
+          [
+              _Ty1=float
+          ]
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Header.h(104,34): message : see reference to function template instantiation 'std::pair<float,float>::pair<double,double,0>(_Other1 &&,_Other2 &&) noexcept' being compiled
+          with
+          [
+              _Other1=double,
+              _Other2=double
+          ]
+test.obj : error LNK2019: unresolved external symbol "public: __cdecl olc::Pixel::Pixel(unsigned char,unsigned char,unsigned char,unsigned char)" (??0Pixel@olc@@QEAA@EEEE@Z) referenced in function "void __cdecl olc::`dynamic initializer for 'BLACK''(void)" (??__EBLACK@olc@@YAXXZ)
+test.obj : error LNK2019: unresolved external symbol "public: virtual __cdecl olc::PixelGameEngine::~PixelGameEngine(void)" (??1PixelGameEngine@olc@@UEAA@XZ) referenced in function "public: virtual __cdecl OneLoneCoder_Asteroids::~OneLoneCoder_Asteroids(void)" (??1OneLoneCoder_Asteroids@@UEAA@XZ)
+test.obj : error LNK2019: unresolved external symbol "public: __cdecl OneLoneCoder_Asteroids::OneLoneCoder_Asteroids(void)" (??0OneLoneCoder_Asteroids@@QEAA@XZ) referenced in function "public: __cdecl OneLoneCoder_AsteroidsTest::OneLoneCoder_AsteroidsTest(void)" (??0OneLoneCoder_AsteroidsTest@@QEAA@XZ)
+test.obj : error LNK2019: unresolved external symbol "public: float __cdecl OneLoneCoder_Asteroids::DegreeToRadian(float)" (?DegreeToRadian@OneLoneCoder_Asteroids@@QEAAMM@Z) referenced in function "private: virtual void __cdecl OneLoneCoder_AsteroidsTest_TestDegreeToRadian_Test::TestBody(void)" (?TestBody@OneLoneCoder_AsteroidsTest_TestDegreeToRadian_Test@@EEAAXXZ)
+C:\Users\bruno\source\repos\2D_Game_Shooting\x64\Debug\gunit.exe : fatal error LNK1120: 4 unresolved externals
