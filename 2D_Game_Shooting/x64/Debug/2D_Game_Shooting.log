@@ -1,31 +1,94 @@
 ﻿  Source.cpp
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(86,22): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(86,19): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(87,41): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(87,37): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(128,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(167,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(233,15): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(233,10): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(299,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(328,85): warning C4244: 'argument': conversion from '_Ty2' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Header.h(110,22): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(96,22): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(96,19): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(97,41): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(97,37): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(138,39): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(177,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(243,15): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(243,10): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(327,62): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(327,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(328,62): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(328,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(329,62): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(329,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(332,41): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(332,37): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(332,33): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(332,29): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(332,25): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(332,21): warning C4244: 'argument': conversion from 'float' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(355,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(385,69): warning C4244: 'argument': conversion from '_Ty2' to 'int32_t', possible loss of data
           with
           [
               _Ty2=float
           ]
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(328,41): warning C4244: 'argument': conversion from '_Ty1' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(385,33): warning C4244: 'argument': conversion from '_Ty1' to 'int32_t', possible loss of data
           with
           [
               _Ty1=float
           ]
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(327,93): warning C4244: 'argument': conversion from '_Ty2' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(384,77): warning C4244: 'argument': conversion from '_Ty2' to 'int32_t', possible loss of data
           with
           [
               _Ty2=float
           ]
-C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(327,49): warning C4244: 'argument': conversion from '_Ty1' to 'int32_t', possible loss of data
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Source.cpp(384,41): warning C4244: 'argument': conversion from '_Ty1' to 'int32_t', possible loss of data
           with
           [
               _Ty1=float
           ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,16): warning C4244: 'initializing': conversion from '_Ty' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+          and
+          [
+              _Ty1=float
+          ]
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Header.h(66,13): message : see reference to function template instantiation 'std::pair<float,float>::pair<int,int,0>(_Other1 &&,_Other2 &&) noexcept' being compiled
+          with
+          [
+              _Other1=int,
+              _Other2=int
+          ]
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Header.h(65,81): message : see the first reference to 'std::pair<float,float>::pair' in 'OneLoneCoder_Asteroids::OneLoneCoder_Asteroids'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,54): warning C4244: 'initializing': conversion from '_Ty' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+          and
+          [
+              _Ty2=float
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,54): warning C4244: 'initializing': conversion from '_Ty' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+          and
+          [
+              _Ty2=float
+          ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\utility(242,16): warning C4244: 'initializing': conversion from '_Ty' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+          and
+          [
+              _Ty1=float
+          ]
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Header.h(68,34): message : see reference to function template instantiation 'std::pair<float,float>::pair<double,double,0>(_Other1 &&,_Other2 &&) noexcept' being compiled
+          with
+          [
+              _Other1=double,
+              _Other2=double
+          ]
+C:\Users\bruno\source\repos\2D_Game_Shooting\2D_Game_Shooting\Header.h(65,81): message : see the first reference to 'std::pair<float,float>::pair' in 'OneLoneCoder_Asteroids::OneLoneCoder_Asteroids'
   2D_Game_Shooting.vcxproj -> C:\Users\bruno\source\repos\2D_Game_Shooting\x64\Debug\2D_Game_Shooting.exe
